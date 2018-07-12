@@ -117,7 +117,13 @@ export default {
             this.error = false;
         }
         if (!this.error) {
-            this.pushToHistory();
+            const oldHistory = Storage.loadHistory();
+            if (oldHistory.length > 0) {
+                this.history = oldHistory;
+                // TODO: 检查历史最后一项和persons里的值匹不匹配
+            } else {
+                this.pushToHistory();
+            }
         }
     },
     computed: {
@@ -193,6 +199,11 @@ export default {
             if (this.trunOffPersons.length !== this.configs.personCount - 4) {
                 return alert("轮空人员信息错误");
             }
+            // 检查bankerWasWon是否为布尔值
+            if (typeof this.bankerWasWon !== "boolean") {
+                return alert("庄家输赢信息错误");
+            }
+
             // 得到在场上游戏的闲家
             const players = this.configs.persons.filter(person => {
                 // 非庄且非轮空
@@ -205,14 +216,28 @@ export default {
             const { category } = this;
             const tableKey = `table${this.upperCaseFirstLetter(category)}`;
             const { scores } = this.configs;
-            // 庄进钱。闲家数量为3
-            this.banker.score += scores[category] * 3 - scores[tableKey];
-            // 闲扣钱
-            players.forEach(player => {
-                player.score -= scores[category];
-            });
+            // 庄赢了
+            if (this.bankerWasWon) {
+                // 庄进钱。闲家数量为3
+                this.banker.score += scores[category] * 3 - scores[tableKey];
+                // 闲扣钱
+                players.forEach(player => {
+                    player.score -= scores[category];
+                });
+            } else {
+                // 庄家如果头家输了，扣钱也是和二包一样
+                const reduceScore =
+                    category === "first" ? scores["second"] : scores[category];
+                // 庄扣钱
+                this.banker.score -= reduceScore * 3;
+                // 闲进钱
+                players.forEach(player => {
+                    player.score += reduceScore;
+                });
+            }
             // 推入历史纪录
             this.pushToHistory();
+            this.close();
         },
     },
 };
