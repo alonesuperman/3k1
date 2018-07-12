@@ -11,11 +11,23 @@
 
 <script>
 import myHeader from "./components/Header";
+import Storage from "@/js/Storage";
 
 export default {
     name: "App",
     components: {
         myHeader,
+    },
+    mounted() {
+        const configs = Storage.load();
+        const history = Storage.loadHistory();
+        if (!configs && history.length === 0) {
+            this.$router.replace({ name: "rule", query: {} });
+        } else if (configs && history.length > 0) {
+            this.$router.replace({ name: "playing", query: {} });
+        } else {
+            alert("有残余垃圾数据");
+        }
     },
 };
 </script>
