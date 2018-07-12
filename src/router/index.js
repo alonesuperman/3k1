@@ -14,7 +14,18 @@ const router = new Router({
                 {
                     path: "rule",
                     name: "rule",
+                    meta: {
+                        title: "规则定制中",
+                    },
                     component: resolve => require(['@/components/Rule.vue'], resolve),
+                },
+                {
+                    path: "playing",
+                    name: "playing",
+                    meta: {
+                        title: "游戏进行中",
+                    },
+                    component: resolve => require(['@/components/Playing.vue'], resolve),
                 },
             ]
         },

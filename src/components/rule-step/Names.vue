@@ -24,11 +24,11 @@ export default {
         MyDialog,
     },
     props: {
-        persons: {
+        personCount: {
             type: Number,
             required: true,
         },
-        names: {
+        persons: {
             type: Array,
             required: true,
         },
@@ -48,7 +48,7 @@ export default {
     created() {
         Person.clearAll();
         let i = 1;
-        while (this.persons > this.result.length) {
+        while (this.personCount > this.result.length) {
             this.result.push(new Person(`无名${i}`));
             i++;
         }
@@ -78,7 +78,7 @@ export default {
         },
     },
     beforeDestroy() {
-        this.$emit("update:names", this.result);
+        this.$emit("update:persons", this.result);
     },
 };
 </script>
