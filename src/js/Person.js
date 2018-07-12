@@ -12,4 +12,19 @@ export default class Person {
         // 一些收尾工作
         names.add(name);
     }
+
+    static clearAll() {
+        names.clear();
+    }
+
+    changeName(name) {
+        if (names.has(name)) {
+            return false;
+        } else {
+            names.delete(this.name);
+            names.add(name);
+            this.name = name;
+            return true;
+        }
+    }
 }
