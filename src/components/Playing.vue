@@ -25,20 +25,38 @@
                     </li>
                 </ul>
             </section>
-            <section v-show="showList">
-                <ul>
-                    <li v-for="(item,index) in history" :key="index">
-                        <ul>
-                            <li v-for="(person,i) in item" :key="i">
-                                <span>名字：</span>
-                                <span>{{person.name}}</span>
-                                <span>分数:</span>
-                                <span>{{person.score}}</span>
-                            </li>
-                        </ul>
-                        <hr>
-                    </li>
-                </ul>
+            <section v-show="showList" class="h100">
+                <div class="table-head">
+                    <table cellspacing="0" cellpadding="0" border="0">
+                        <colgroup>
+                            <col :width="`${100/(configs.personCount+1)}%`" v-for="p in configs.persons" :key="p.name">
+                            <!-- 还有一个台板 -->
+                            <col :width="`${100/(configs.personCount+1)}%`">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th colspan="1" rowspan="1" v-for="person in resultOnlyList" :key="person.name">{{person.name}}</th>
+                                <th colspan="1" rowspan="1">台板</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="table-body">
+                    <table cellspacing="0" cellpadding="0" border="0">
+                        <colgroup>
+                            <col :width="`${100/(configs.personCount+1)}%`" v-for="p in configs.persons" :key="p.name">
+                            <!-- 还有一个台板 -->
+                            <col :width="`${100/(configs.personCount+1)}%`">
+                        </colgroup>
+                        <tbody>
+                            <!-- turn指的是每局游戏，因为history是个二维数组 -->
+                            <tr v-for="(turn,i) in history" :key="i">
+                                <td colspan="1" rowspan="1" v-for="person in turn" :key="person.name">{{person.score}}</td>
+                                <td colspan="1" rowspan="1">{{turn | getTableScoreForEachTurn}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </div>
         <div class="footer" v-if="!error" @click="showDialog=true">计分/记账</div>
@@ -144,7 +162,7 @@ export default {
         // 实际台板费
         tableScore() {
             // 先求所有人分数之和
-            const total = this.configs.persons
+            const total = this.resultOnlyList
                 .map(p => p.score)
                 .reduce((i, j) => i + j);
             return 0 - total;
@@ -158,6 +176,13 @@ export default {
             return this.history.length > 0
                 ? this.history[this.history.length - 1]
                 : this.configs.persons;
+        },
+    },
+    filters: {
+        // 历史数据列表中台板计算方法
+        getTableScoreForEachTurn(turn) {
+            const total = turn.map(p => p.score).reduce((i, j) => i + j);
+            return 0 - total;
         },
     },
     methods: {
@@ -214,6 +239,7 @@ export default {
             this.trunOffPersons = [];
             this.showDialog = false;
         },
+        // 核心的算分方法
         calc() {
             // check轮空人员是否正确
             if (this.trunOffPersons.length !== this.configs.personCount - 4) {
@@ -289,6 +315,25 @@ export default {
     }
     .list {
         height: calc(~"100% - @{tabsHeight} - @{footerHeight}");
+        overflow: hidden;
+        .h100 {
+            overflow: hidden;
+            height: 100%;
+            tr {
+                height: 2em;
+            }
+            table {
+                width: 100%;
+            }
+            @tableHeadHeight: 3em;
+            .table-head {
+                height: @tableHeadHeight;
+            }
+            .table-body {
+                height: calc(~"100% - @{tableHeadHeight}");
+                overflow: auto;
+            }
+        }
     }
     .footer {
         height: @footerHeight;
