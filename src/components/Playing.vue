@@ -12,7 +12,7 @@
         <div class="list" v-else>
             <section v-show="!showList">
                 <ul>
-                    <li v-for="person in configs.persons" :key="person.name">
+                    <li v-for="person in resultOnlyList" :key="person.name">
                         <span>{{person.name}}</span>
                         <span>分数:</span>
                         <span>{{person.score}}</span>
@@ -25,7 +25,21 @@
                     </li>
                 </ul>
             </section>
-            <section v-show="showList"></section>
+            <section v-show="showList">
+                <ul>
+                    <li v-for="(item,index) in history" :key="index">
+                        <ul>
+                            <li v-for="(person,i) in item" :key="i">
+                                <span>名字：</span>
+                                <span>{{person.name}}</span>
+                                <span>分数:</span>
+                                <span>{{person.score}}</span>
+                            </li>
+                        </ul>
+                        <hr>
+                    </li>
+                </ul>
+            </section>
         </div>
         <div class="footer" v-if="!error" @click="showDialog=true">计分/记账</div>
         <MyDialog :appendToBody="true" v-if="showDialog" title="计分/记账" @close="close" @confirm="calc">
@@ -138,6 +152,12 @@ export default {
         // 是否需要计算轮空人员
         isSomeoneTurnOff() {
             return this.configs.personCount > 4;
+        },
+        // 给只看结果界面看的
+        resultOnlyList() {
+            return this.history.length > 0
+                ? this.history[this.history.length - 1]
+                : this.configs.persons;
         },
     },
     methods: {

@@ -61,6 +61,8 @@ export default {
         },
         finishConfig() {
             if (this.saveConfigs()) {
+                // 清空history
+                Storage.cleanHistory();
                 // 跳转去下一模块
                 this.$router.replace("playing");
             }

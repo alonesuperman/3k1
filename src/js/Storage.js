@@ -57,6 +57,9 @@ export default class Storage {
     static saveHistory(history) {
         localStorage.setItem(historyStorageKey, JSON.stringify(history));
     }
+    static cleanHistory() {
+        localStorage.removeItem(historyStorageKey);
+    }
 
     static load() {
         return (orginalLoad())[dataKey];
