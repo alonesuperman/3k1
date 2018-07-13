@@ -40,6 +40,10 @@ export default class Storage {
      * @param {Boolean} quiet - 选填。默认为false。是否启用安静模式，即发生数据覆盖不提醒用户
      */
     static save(configs, quiet = false) {
+        if (!configs) {
+            alert("configs是必填项");
+            return false;
+        }
         const oldData = orginalLoad();
         if (!quiet && oldData[dataKey]) {
             const choice = confirm("发现有旧存档，是否覆盖");
@@ -55,6 +59,10 @@ export default class Storage {
         return true;
     }
     static saveHistory(history) {
+        if (!history) {
+            alert("configs是必填项");
+            return false;
+        }
         localStorage.setItem(historyStorageKey, JSON.stringify(history));
     }
     static cleanHistory() {

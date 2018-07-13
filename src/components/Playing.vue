@@ -10,7 +10,7 @@
             <router-link tag="p" to="/rule">重新设定</router-link>
         </div>
         <div class="list" v-else>
-            <section v-show="!showList">
+            <section class="h100 resultOnly" v-show="!showList">
                 <ul>
                     <li v-for="person in resultOnlyList" :key="person.name">
                         <span>{{person.name}}</span>
@@ -22,6 +22,17 @@
                         <span>台板</span>
                         <span>分数:</span>
                         <span>{{tableScore}}</span>
+                        <br>
+                        <span>台板上限</span>
+                        <span>{{configs.maxTableScore}}</span>
+                    </li>
+                    <li class="set-taiban">
+                        <span style="cursor:pointer;color:orange;" @click="editMaxTableScore=true">修改台板上限</span>
+                        <MyDialog v-if="editMaxTableScore" @close="editMaxTableScore=false" @confirm="setMaxTableScore" title="修改台板上限">
+                            <div class="ct" style="padding-top:3em;">
+                                <input type="tel" ref="setMaxTableScore" style="text-align:center;">
+                            </div>
+                        </MyDialog>
                     </li>
                 </ul>
             </section>
@@ -121,10 +132,13 @@ export default {
                     tableSecond: 10,
                     tableThird: 0,
                 },
+                // 台板上限
+                maxTableScore: 150,
             },
             */
             configs: null,
             error: null,
+            editMaxTableScore: false,
             // 历史记录
             history: [],
             showDialog: false,
@@ -248,6 +262,20 @@ export default {
             this.trunOffPersons = [];
             this.showDialog = false;
         },
+        // 修改台板上限
+        setMaxTableScore() {
+            const ref = this.$refs.setMaxTableScore;
+            const val = ref.value;
+            if (/^\d+$/.test(val)) {
+                this.configs.maxTableScore = parseInt(val);
+                // 存起来
+                Storage.save(this.configs, true);
+                this.editMaxTableScore = false;
+            } else {
+                console.log(val);
+                alert("输入数字不对");
+            }
+        },
         // 核心的算分方法
         calc() {
             // check轮空人员是否正确
@@ -273,8 +301,14 @@ export default {
             const { scores } = this.configs;
             // 庄赢了
             if (this.bankerWasWon) {
-                // 庄进钱。闲家数量为3
-                this.banker.score += scores[category] * 3 - scores[tableKey];
+                if (this.tableScore < this.configs.maxTableScore) {
+                    // 庄进钱。闲家数量为3
+                    this.banker.score +=
+                        scores[category] * 3 - scores[tableKey];
+                } else {
+                    // 台板如果已经达到上限则不扣除
+                    this.banker.score += scores[category] * 3;
+                }
                 // 闲扣钱
                 players.forEach(player => {
                     player.score -= scores[category];
@@ -342,6 +376,13 @@ export default {
             .table-body {
                 height: calc(~"100% - @{tableHeadHeight}");
                 overflow: auto;
+            }
+        }
+        .resultOnly {
+            .set-taiban {
+                margin-top: 1em;
+                padding-top: 1em;
+                border-top: solid 1px orange;
             }
         }
     }

@@ -7,6 +7,10 @@
                 <span style="margin-right:1em;" class="btn" :class="{selected:result.personCount === count}" v-for="count in personList" :key="count" @click="result.personCount = count">{{count}}人</span>
             </div>
             <hr>
+            <div>台版上限(游戏开始以后还可以修改)</div>
+            <div>
+                <input type="tel" class="ipt2" v-model="result.maxTableScore">
+            </div>
         </section>
         <section class="set-names" v-if="step === 2">
             <Names :personCount="result.personCount" :persons.sync="result.persons" />
@@ -48,6 +52,8 @@ export default {
                     tableSecond: 10,
                     tableThird: 0,
                 },
+                // 台板上限
+                maxTableScore: 150,
             },
         };
     },
@@ -93,6 +99,14 @@ export default {
         &.big {
             width: 6em;
         }
+    }
+    .ipt2 {
+        height: 3em;
+        line-height: 3em;
+        margin-top: 1em;
+        font-size: 1.5em;
+        width: 6em;
+        text-align: center;
     }
     .foot {
         position: absolute;
