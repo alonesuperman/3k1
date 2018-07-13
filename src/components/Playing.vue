@@ -86,7 +86,8 @@
                 <div v-if="isSomeoneTurnOff">
                     <div>谁轮空了?</div>
                     <div>
-                        <span class="btn" v-for="person in configs.persons" :key="person.name" :class="{selected:trunOffPersons.includes(person)}" @click="toggleTrunOffPerson(person)">{{person.name}}</span>
+                        <!-- 要把庄过滤掉，一个人不可能既是庄又是轮空 -->
+                        <span class="btn" v-for="person in configs.persons.filter(p=>p!==banker)" :key="person.name" :class="{selected:trunOffPersons.includes(person)}" @click="toggleTrunOffPerson(person)">{{person.name}}</span>
                     </div>
                 </div>
             </div>
@@ -176,6 +177,14 @@ export default {
             return this.history.length > 0
                 ? this.history[this.history.length - 1]
                 : this.configs.persons;
+        },
+    },
+    watch: {
+        // 点击切换庄的时候要把轮空人员清掉
+        banker(v, oldV) {
+            if (v !== oldV) {
+                this.trunOffPersons = [];
+            }
         },
     },
     filters: {
@@ -325,9 +334,10 @@ export default {
             table {
                 width: 100%;
             }
-            @tableHeadHeight: 3em;
+            @tableHeadHeight: 2em;
             .table-head {
                 height: @tableHeadHeight;
+                border-bottom: solid 1px rgb(26, 173, 13);
             }
             .table-body {
                 height: calc(~"100% - @{tableHeadHeight}");
