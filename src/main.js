@@ -1,3 +1,5 @@
+// 挂载垫片
+import "./js/polyfill";
 import Vue from 'vue'
 import App from './App'
 //引入router
