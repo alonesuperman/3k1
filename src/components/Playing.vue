@@ -288,6 +288,14 @@ export default {
             }
 
             // 得到在场上游戏的闲家
+            this.configs.persons.forEach(person => {
+                this.history[this.history.length - 1].forEach(item => {
+                    if (item.name === person.name) {
+                        person.score = item.score;
+                    }
+                });
+            });
+
             const players = this.configs.persons.filter(person => {
                 // 非庄且非轮空
                 return (
